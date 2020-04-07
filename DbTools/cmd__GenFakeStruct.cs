@@ -32,28 +32,28 @@ namespace DbTools
             #region Create tables
             file.Schema.Tables.ForEach((_, obj) =>
             {
-                bldr.AppendLine("CREATE TABLE " + obj.GetFullName() + "();");
+                bldr.AppendLine("CREATE TABLE " + obj.GetFullName() + "(A INT NULL);");
             });
             #endregion
 
             #region Create views
             file.Schema.Views.ForEach((_, obj) =>
             {
-                bldr.AppendLine("CREATE VIEW " + obj.GetFullName() + " AS SELECT 1;");
+                bldr.AppendLine("CREATE VIEW " + obj.GetFullName() + " AS SELECT 1 AS [A];");
             });
             #endregion
 
             #region Create functions
             file.Schema.Functions.ForEach((_, obj) =>
             {
-                bldr.AppendLine("CREATE FUNCTION " + obj.GetFullName() + "() RETURNS INT AS RETURN 1;");
+                bldr.AppendLine("CREATE FUNCTION " + obj.GetFullName() + "() RETURNS INT AS BEGIN RETURN 1 END;");
             });
             #endregion
 
             #region Create procedures
             file.Schema.Procedures.ForEach((_, obj) =>
             {
-                bldr.AppendLine("CREATE PROCEDURE " + obj.GetFullName() + "() AS PRINT '1';");
+                bldr.AppendLine("CREATE PROCEDURE " + obj.GetFullName() + " AS BEGIN PRINT '1' END;");
             });
             #endregion
 
