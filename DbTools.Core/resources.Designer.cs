@@ -70,6 +70,18 @@ namespace DbTools.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Generate an fake DB structure
+        ///-f  DB schema file
+        ///-o  Output file
+        ///-v  Verbose.
+        /// </summary>
+        internal static string @__cli_cmd__genfakestruct {
+            get {
+                return ResourceManager.GetString("__cli_cmd__genfakestruct", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Print help (documentation).
         /// </summary>
         internal static string @__cli_cmd__help {

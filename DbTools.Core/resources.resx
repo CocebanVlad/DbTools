@@ -120,6 +120,12 @@
   <data name="__cli_cmd__cls" xml:space="preserve">
     <value>Clear screen</value>
   </data>
+  <data name="__cli_cmd__genfakestruct" xml:space="preserve">
+    <value>Generate an fake DB structure
+-f  DB schema file
+-o  Output file
+-v  Verbose</value>
+  </data>
   <data name="__cli_cmd__help" xml:space="preserve">
     <value>Print help (documentation)</value>
   </data>
