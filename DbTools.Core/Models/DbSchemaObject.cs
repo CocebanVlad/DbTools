@@ -1,10 +1,13 @@
-﻿namespace DbTools.Core.Models
+﻿using System;
+
+namespace DbTools.Core.Models
 {
+    [Serializable]
     public abstract class DbSchemaObject : DbObject
     {
         /// <summary>
         /// Get or set object name
         /// </summary>
-        public string SchemaName { get; internal set; }
+        public string SchemaName { get; set; }
     }
 }

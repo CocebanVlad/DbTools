@@ -19,7 +19,7 @@ namespace DbTools.Core {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class resources {
@@ -61,17 +61,6 @@ namespace DbTools.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Clone a database into a new directory
-        ///-c  Connection string
-        ///-d  Directory.
-        /// </summary>
-        internal static string @__cli_cmd__clone {
-            get {
-                return ResourceManager.GetString("__cli_cmd__clone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Clear screen.
         /// </summary>
         internal static string @__cli_cmd__cls {
@@ -86,6 +75,19 @@ namespace DbTools.Core {
         internal static string @__cli_cmd__help {
             get {
                 return ResourceManager.GetString("__cli_cmd__help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Initialize a new DB schema file
+        ///-c  Connection string
+        ///-n  Schema name
+        ///-o  Output file
+        ///-v  Verbose.
+        /// </summary>
+        internal static string @__cli_cmd__init {
+            get {
+                return ResourceManager.GetString("__cli_cmd__init", resourceCulture);
             }
         }
         

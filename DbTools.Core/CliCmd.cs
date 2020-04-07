@@ -27,8 +27,7 @@ namespace DbTools.Core
                 idx = lastIdx + 1;
             Cmd = str.Substring(0, idx);
 
-            var parameters =
-                new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+            var parameters = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
             if (idx != lastIdx)
             {
                 #region Collect parameters
@@ -36,21 +35,25 @@ namespace DbTools.Core
                 var valStrBldr = new StringBuilder();
                 var strBldr = keyStrBldr;
                 var strBldrLock = false;
-                var collect =
-                    new Action(() =>
-                    {
-                        parameters[keyStrBldr.ToString()] = valStrBldr.ToString();
-                        keyStrBldr.Clear();
-                        valStrBldr.Clear();
-                        strBldr = keyStrBldr;
-                        strBldrLock = false;
-                    });
+                var collect = new Action(() =>
+                {
+                    if (keyStrBldr.Length == 0)
+                        return;
+                    parameters[keyStrBldr.ToString()] = valStrBldr.ToString();
+                    keyStrBldr.Clear();
+                    valStrBldr.Clear();
+                    strBldr = keyStrBldr;
+                    strBldrLock = false;
+                });
 
                 while (++idx < str.Length)
                 {
                     switch (str[idx])
                     {
                         case ' ':
+                        case '\t':
+                        case '\n':
+                        case '\r':
                             // @if current string builder is locked then append char
                             // @else if current string builder is not locked and
                             //    the previous character is diffrent from the current one (space) then
@@ -100,9 +103,7 @@ namespace DbTools.Core
                 #endregion
             }
 
-            Params = new ReadOnlyDictionary<string, string>(
-                parameters
-                );
+            Params = new ReadOnlyDictionary<string, string>(parameters);
         }
 
         /// <summary>

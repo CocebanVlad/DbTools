@@ -1,10 +1,9 @@
-﻿namespace DbTools.Core.Models
+﻿using System;
+
+namespace DbTools.Core.Models
 {
-    public class DbTable : DbSchemaObject
+    [Serializable]
+    public class DbTable : DbDataStructure
     {
-        /// <summary>
-        /// Get or set table columns collection
-        /// </summary>
-        public DbObjectCollection<DbColumn> Columns { get; internal set; }
     }
 }

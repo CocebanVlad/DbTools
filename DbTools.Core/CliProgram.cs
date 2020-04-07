@@ -26,15 +26,13 @@ namespace DbTools.Core
         public void Run(string[] args)
         {
             Running = true;
-
-            //
-            // Print help
             Exec.Register("help", (p) => PrintHelp());
-
             RegisterCommands(Exec);
 
             if (args == null || args.Length == 0)
+            {
                 ExecuteInLoop();
+            }
             else
             {
                 Execute(string.Join(" ", args));
@@ -72,12 +70,7 @@ namespace DbTools.Core
         /// </summary>
         private void ExecuteInLoop()
         {
-            //
-            // Quit
             Exec.Register("quit", (p) => Stop());
-
-            //
-            // Clear screen
             Exec.Register("cls", (p) => Console.Clear());
 
             Console.WriteLine();
@@ -85,7 +78,7 @@ namespace DbTools.Core
             while (Running)
             {
                 CliHelpers.Write("> ", ConsoleColor.White);
-                Execute(Console.ReadLine());
+                Execute(CliHelpers.ReadLine());
             }
         }
         #endregion

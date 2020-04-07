@@ -117,16 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="__cli_cmd__clone" xml:space="preserve">
-    <value>Clone a database into a new directory
--c  Connection string
--d  Directory</value>
-  </data>
   <data name="__cli_cmd__cls" xml:space="preserve">
     <value>Clear screen</value>
   </data>
   <data name="__cli_cmd__help" xml:space="preserve">
     <value>Print help (documentation)</value>
+  </data>
+  <data name="__cli_cmd__init" xml:space="preserve">
+    <value>Initialize a new DB schema file
+-c  Connection string
+-n  Schema name
+-o  Output file
+-v  Verbose</value>
   </data>
   <data name="__cli_cmd__quit" xml:space="preserve">
     <value>Quit program</value>

@@ -1,6 +1,5 @@
 ﻿using DbTools.Core;
 using System;
-using System.Data.SqlClient;
 
 namespace DbTools
 {
@@ -18,22 +17,22 @@ namespace DbTools
         /// <param name="exec">Executor</param>
         protected override void RegisterCommands(CliExec exec)
         {
-            exec.Register("clone", (p) =>
+            exec.Register("init", (p) =>
             {
                 if (!p.ContainsKey("c"))
                     throw new ArgumentNullException("-c: Connection string");
                 var c = p["c"];
 
-                if (!p.ContainsKey("d"))
-                    throw new ArgumentNullException("-d: Directory");
-                var d = p["d"];
+                if (!p.ContainsKey("n"))
+                    throw new ArgumentNullException("-n: Schema name");
+                var d = p["n"];
 
-                using (var conn = new SqlConnection(c))
-                {
-                    var schema = DbHelpers.GetSchema(conn, "dbo");
-                }
+                if (!p.ContainsKey("o"))
+                    throw new ArgumentNullException("-o: Output file");
+                var o = p["o"];
 
-                // Incomplete implementation
+                var file = DbSchemaFile.Factory.Init(p["c"], p["n"], p.ContainsKey("v"));
+                file.Save(o);
             });
         }
     }

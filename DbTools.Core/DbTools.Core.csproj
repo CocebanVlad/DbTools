@@ -45,7 +45,10 @@
     <Compile Include="CliExec.cs" />
     <Compile Include="CliHelpers.cs" />
     <Compile Include="CliProgram.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="DbHelpers.cs" />
+    <Compile Include="DbSchemaFile.cs" />
+    <Compile Include="DbSchemaFileFactory.cs" />
     <Compile Include="Models\DbCollationInfo.cs" />
     <Compile Include="Models\DbColumn.cs" />
     <Compile Include="Models\DbColumnDataCharacterInfo.cs" />
@@ -53,17 +56,25 @@
     <Compile Include="Models\DbColumnDataInfo.cs" />
     <Compile Include="Models\DbColumnDataNumericInfo.cs" />
     <Compile Include="Models\DbColumnDataType.cs" />
+    <Compile Include="Models\DbDataStructure.cs" />
+    <Compile Include="Models\DbFunction.cs" />
     <Compile Include="Models\DbObject.cs" />
     <Compile Include="Models\DbObjectCollection.cs" />
+    <Compile Include="Models\DbProcedure.cs" />
+    <Compile Include="Models\DbRoutine.cs" />
     <Compile Include="Models\DbSchema.cs" />
     <Compile Include="Models\DbSchemaObject.cs" />
+    <Compile Include="Models\DbSynonym.cs" />
     <Compile Include="Models\DbTable.cs" />
     <Compile Include="Models\DbTableIndex.cs" />
     <Compile Include="Models\DbTableIndexColumn.cs" />
     <Compile Include="Models\DbTableIndexColumnOrderType.cs" />
     <Compile Include="Models\DbTableIndexType.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Models\DbUnknownSchemaObject.cs" />
+    <Compile Include="Models\DbView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Prototype\IDbDefinedObject.cs" />
     <Compile Include="resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -76,6 +87,7 @@
       <LastGenOutput>resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

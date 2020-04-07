@@ -5,8 +5,7 @@ namespace DbTools.Core
 {
     public sealed class CliExec
     {
-        private Dictionary<string, CliAction> _registry =
-            new Dictionary<string, CliAction>(StringComparer.InvariantCultureIgnoreCase);
+        private readonly Dictionary<string, CliAction> _registry = new Dictionary<string, CliAction>(StringComparer.InvariantCultureIgnoreCase);
 
         /// <summary>
         /// Encapsulates a method intended for execution of a command
@@ -42,14 +41,9 @@ namespace DbTools.Core
         /// <param name="str">Command</param>
         public void Exec(string str)
         {
-            var cmd =
-                new CliCmd(str);
+            var cmd = new CliCmd(str);
             if (!_registry.ContainsKey(cmd.Cmd))
-                throw new CliException(
-                    string.Format(
-                        resources.__cli_error__0__is_not_recognized_as_command,
-                        cmd.Cmd
-                        ));
+                throw new CliException(string.Format(resources.__cli_error__0__is_not_recognized_as_command, cmd.Cmd));
 
             _registry[cmd.Cmd].Invoke(cmd.Params);
         }
@@ -63,15 +57,9 @@ namespace DbTools.Core
         {
             if (string.IsNullOrEmpty(cmd))
                 return null;
-            var doc = resources.ResourceManager.GetString(
-                string.Format(
-                    "__cli_cmd__{0}",
-                    cmd.ToLower()
-                    ));
 
-            return string.IsNullOrEmpty(doc)
-                ? resources.__cli_undocumented_command
-                : doc;
+            var doc = resources.ResourceManager.GetString(string.Format("__cli_cmd__{0}", cmd.ToLower()));
+            return string.IsNullOrEmpty(doc) ? resources.__cli_undocumented_command : doc;
         }
     }
 }
