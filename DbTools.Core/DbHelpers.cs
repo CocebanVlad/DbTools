@@ -3,10 +3,40 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Threading;
 
 namespace DbTools.Core
 {
+    /*
+     * https://docs.microsoft.com/en-us/sql/relational-databases/system-compatibility-views/sys-sysobjects-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15
+     * Object type. Can be one of the following values:
+     * ---------------
+     *  AF   ggregate function (CLR)
+     *  C    CHECK constraint
+     *  D    Default or DEFAULT constraint
+     *  F    FOREIGN KEY constraint
+     *  FN   Scalar function
+     *  FS   Assembly (CLR) scalar-function
+     *  FT   Assembly (CLR) table-valued functionIF = In-lined table-function
+     *  IT   Internal table
+     *  K    PRIMARY KEY or UNIQUE constraint
+     *  L    Log
+     *  P    Stored procedure
+     *  PC   Assembly (CLR) stored-procedure
+     *  R    Rule
+     *  RF   Replication filter stored procedure
+     *  S    System table
+     *  SN   Synonym
+     *  SQ   Service queue
+     *  TA   Assembly (CLR) DML trigger
+     *  TF   Table function
+     *  TR   SQL DML Trigger
+     *  TT   Table type
+     *  U    User table
+     *  V    View
+     *  X    Extended stored procedure
+     */
     public static class DbHelpers
     {
         /// <summary>
@@ -46,6 +76,50 @@ namespace DbTools.Core
         }
 
         /// <summary>
+        /// Generate command for getting concrete objects
+        /// </summary>
+        /// <param name="conn">SQL connection</param>
+        /// <param name="schemaName">Schema name</param>
+        /// <param name="type">Object type</param>
+        /// <returns>SQL command</returns>
+        private static SqlCommand GenerateGetConcreteObjectsCommand(SqlConnection conn, string schemaName, params string[] type)
+        {
+            var cmd = new SqlCommand();
+
+            var strBldr = new StringBuilder();
+            strBldr.Append(@"
+                SELECT _obj.[name] AS [Name], _module.[definition] AS [Definition] FROM [sys].[objects] AS _obj
+                LEFT JOIN [sys].[schemas] AS _schema ON _schema.[schema_id] = _obj.[schema_id]
+                LEFT JOIN [sys].[sql_modules] AS _module ON _module.[object_id] = _obj.[object_id]
+                WHERE _schema.[name] LIKE @schemaName
+                ");
+            #region Append type constraint
+            if (type.Length > 0)
+            {
+                strBldr.Append(" AND _obj.[type] IN (");
+
+                for (var i = 0; i < type.Length; i++)
+                {
+                    if (i > 0)
+                    {
+                        strBldr.Append(", ");
+                    }
+
+                    strBldr.Append($"@{cmd.Parameters.AddWithValue($"__param{i}", type[i]).ParameterName}");
+                }
+
+                strBldr.Append(")");
+            }
+            #endregion
+
+            cmd.Connection = conn;
+            cmd.CommandText = strBldr.ToString();
+            cmd.Parameters.AddWithValue("schemaName", schemaName);
+
+            return cmd;
+        }
+
+        /// <summary>
         /// Generate command for getting all tables
         /// </summary>
         /// <param name="conn">SQL connection</param>
@@ -53,14 +127,7 @@ namespace DbTools.Core
         /// <returns>SQL command</returns>
         private static SqlCommand GenerateGetTablesCommand(SqlConnection conn, string schemaName)
         {
-            var cmd = new SqlCommand(@"
-                SELECT _table.[name] AS [Name] FROM [sys].[tables] AS _table
-                LEFT JOIN [sys].[schemas] AS _schema ON _schema.[schema_id] = _table.[schema_id]
-                WHERE _schema.[name] LIKE @schemaName
-                ", conn);
-            cmd.Parameters.AddWithValue("schemaName", schemaName);
-
-            return cmd;
+            return GenerateGetConcreteObjectsCommand(conn, schemaName, "U");
         }
 
         /// <summary>
@@ -71,15 +138,29 @@ namespace DbTools.Core
         /// <returns>SQL command</returns>
         private static SqlCommand GenerateGetViewsCommand(SqlConnection conn, string schemaName)
         {
-            var cmd = new SqlCommand(@"
-                SELECT _view.[name] AS [Name], _module.[definition] AS [Definition] FROM [sys].[views] AS _view
-                LEFT JOIN [sys].[schemas] AS _schema ON _schema.[schema_id] = _view.[schema_id]
-                LEFT JOIN [sys].[sql_modules] AS _module ON _module.[object_id] = _view.[object_id]
-                WHERE _schema.[name] LIKE @schemaName
-                ", conn);
-            cmd.Parameters.AddWithValue("schemaName", schemaName);
+            return GenerateGetConcreteObjectsCommand(conn, schemaName, "V");
+        }
 
-            return cmd;
+        /// <summary>
+        /// Generate command for getting all functions
+        /// </summary>
+        /// <param name="conn">SQL connection</param>
+        /// <param name="schemaName">Schema name</param>
+        /// <returns>SQL command</returns>
+        private static SqlCommand GenerateGetFunctionsCommand(SqlConnection conn, string schemaName)
+        {
+            return GenerateGetConcreteObjectsCommand(conn, schemaName, "FN", "FS", "FT", "IF", "TF");
+        }
+
+        /// <summary>
+        /// Generate command for getting all procedures
+        /// </summary>
+        /// <param name="conn">SQL connection</param>
+        /// <param name="schemaName">Schema name</param>
+        /// <returns>SQL command</returns>
+        private static SqlCommand GenerateGetProceduresCommand(SqlConnection conn, string schemaName)
+        {
+            return GenerateGetConcreteObjectsCommand(conn, schemaName, "P", "PC", "RF", "X");
         }
 
         /// <summary>
@@ -311,6 +392,22 @@ namespace DbTools.Core
                 };
             }
         }
+
+        /// <summary>
+        /// Fill routine with data
+        /// </summary>
+        /// <param name="conn">SQL connection</param>
+        /// <param name="routine">Routine to fill</param>
+        /// <param name="schema">Schema</param>
+        /// <param name="row">Row</param>
+        /// <param name="verbose">Flag specifying whether to provide additional details regarding the execution or not</param>
+        private static void FillDbRoutine(SqlConnection conn, DbRoutine routine, DbSchema schema, DataRow row, bool verbose = false)
+        {
+            routine.Name = row.GetStringValue("Name");
+            routine.CatalogName = schema.CatalogName;
+            routine.SchemaName = schema.Name;
+            routine.DDLScript = row.GetStringValue("Definition");
+        }
         #endregion
 
         /// <summary>
@@ -375,10 +472,52 @@ namespace DbTools.Core
             t2.Start();
             #endregion
 
+            #region STEP 4. Fetch function
+            schema.Functions = new DbObjectCollection<DbFunction>();
+            var t3 = new Thread(() =>
+            {
+                var functions = new DataTable("Functions");
+                using (var c = new SqlConnection(conn.ConnectionString))
+                {
+                    c.Open();
+                    functions.Fill(GenerateGetFunctionsCommand(c, schemaName));
+                    foreach (DataRow r in functions.Rows)
+                    {
+                        var function = new DbFunction();
+                        FillDbRoutine(c, function, schema, r, verbose);
+                        schema.Functions.Add(function.Name, function);
+                    }
+                }
+            });
+            t3.Start();
+            #endregion
+
+            #region STEP 5. Fetch procedures
+            schema.Procedures = new DbObjectCollection<DbProcedure>();
+            var t4 = new Thread(() =>
+            {
+                var procedures = new DataTable("Procedures");
+                using (var c = new SqlConnection(conn.ConnectionString))
+                {
+                    c.Open();
+                    procedures.Fill(GenerateGetProceduresCommand(c, schemaName));
+                    foreach (DataRow r in procedures.Rows)
+                    {
+                        var procedure = new DbProcedure();
+                        FillDbRoutine(c, procedure, schema, r, verbose);
+                        schema.Procedures.Add(procedure.Name, procedure);
+                    }
+                }
+            });
+            t4.Start();
+            #endregion
+
             t1.Join();
             t2.Join();
+            t3.Join();
+            t4.Join();
 
-            #region STEP 4. Fetch synonyms
+            #region STEP 6. Fetch synonyms
             schema.Synonyms = new DbObjectCollection<DbSynonym>();
             var synonyms = new DataTable("Synonyms");
             synonyms.Fill(GenerateGetSynonymsCommand(conn, schemaName));
@@ -389,6 +528,7 @@ namespace DbTools.Core
                 schema.Synonyms.Add(synonym.Name, synonym);
             }
             #endregion
+
             return schema;
         }
     }
