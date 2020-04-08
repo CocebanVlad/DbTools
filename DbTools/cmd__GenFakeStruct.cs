@@ -33,6 +33,7 @@ namespace DbTools
             file.Schema.Tables.ForEach((_, obj) =>
             {
                 bldr.AppendLine("CREATE TABLE " + obj.GetFullName() + "(A INT NULL);");
+                bldr.AppendLine("GO");
             });
             #endregion
 
@@ -40,6 +41,7 @@ namespace DbTools
             file.Schema.Views.ForEach((_, obj) =>
             {
                 bldr.AppendLine("CREATE VIEW " + obj.GetFullName() + " AS SELECT 1 AS [A];");
+                bldr.AppendLine("GO");
             });
             #endregion
 
@@ -47,6 +49,7 @@ namespace DbTools
             file.Schema.Functions.ForEach((_, obj) =>
             {
                 bldr.AppendLine("CREATE FUNCTION " + obj.GetFullName() + "() RETURNS INT AS BEGIN RETURN 1 END;");
+                bldr.AppendLine("GO");
             });
             #endregion
 
@@ -54,6 +57,7 @@ namespace DbTools
             file.Schema.Procedures.ForEach((_, obj) =>
             {
                 bldr.AppendLine("CREATE PROCEDURE " + obj.GetFullName() + " AS BEGIN PRINT '1' END;");
+                bldr.AppendLine("GO");
             });
             #endregion
 
